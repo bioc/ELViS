@@ -1,3 +1,9 @@
+# ELViS 1.1.1
+* Build error fix
+
+# ELViS 1.1.0
+* Released in Bioconductor
+
 # ELViS 0.99.13
 * Fixed missing dependency
 

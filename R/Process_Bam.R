@@ -13,7 +13,7 @@
 #' @param tmpdir (samtools) Temporary file directory (Default : `tempdir()`)
 #' @param samtools (samtools) Absolute path to samtools executable (Default : NULL)
 #' @param condaenv (samtools_basilisk) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : `"env_samtools"`)
-#' @param condaenv_samtools_version (samtools_basilisk) The version of samtools to install in the conda environment using basilisk (Default : "1.21")
+#' @param condaenv_samtools_version (samtools_basilisk) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")
 #'
 #'
 #' @return a matrix of positions x samples containing base-resolution raw read depth
@@ -70,7 +70,7 @@ get_depth_matrix <-
         ,samtools=NULL # absolute path to samtools
         #basilisk specific options
         ,condaenv = "env_samtools"
-        ,condaenv_samtools_version = "1.21"
+        ,condaenv_samtools_version = "auto"
     ){
 
         stopifnot_character_ge1(bam_files)
@@ -501,11 +501,17 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version,condaenv){
 
 
     # Load samtools conda environment
+    if(condaenv_samtools_version=="auto"){
+        samtools_to_install <- "samtools"
+    }else{
+        samtools_to_install <- glue("samtools=={condaenv_samtools_version}")
+    }
+
     samtools_env <- BasiliskEnvironment(
         envname=condaenv
         ,pkgname="ELViS"
         ,channels = c("conda-forge","bioconda")
-        ,packages=c(glue("samtools=={condaenv_samtools_version}"))
+        ,packages=c(samtools_to_install)
     )
 
     env_dir <- obtainEnvironmentPath(samtools_env)

@@ -18,7 +18,7 @@ get_depth_matrix(
   tmpdir = tempdir(),
   samtools = NULL,
   condaenv = "env_samtools",
-  condaenv_samtools_version = "1.21"
+  condaenv_samtools_version = "auto"
 )
 }
 \arguments{
@@ -48,7 +48,7 @@ get_depth_matrix(
 
 \item{condaenv}{(samtools_basilisk) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : \code{"env_samtools"})}
 
-\item{condaenv_samtools_version}{(samtools_basilisk) The version of samtools to install in the conda environment using basilisk (Default : "1.21")}
+\item{condaenv_samtools_version}{(samtools_basilisk) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")}
 }
 \value{
 a matrix of positions x samples containing base-resolution raw read depth
