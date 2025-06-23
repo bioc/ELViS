@@ -1,3 +1,6 @@
+# ELViS 1.1.2
+* Build error fix
+
 # ELViS 1.1.1
 * Build error fix
 

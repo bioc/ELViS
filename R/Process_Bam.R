@@ -488,14 +488,14 @@ check_mode_os <- function(mode){
     return(mode)
 }
 
-get_envs_samtools_basilisk <- function(condaenv_samtools_version,condaenv){
+get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv){
     # check if basilisk is installed and install if not
     if (!requireNamespace("basilisk", quietly = TRUE)) {
         stop("R Package 'basilisk' does not exist. Please install it by following instructions in 'https://www.bioconductor.org/packages/release/bioc/html/basilisk.html'")
     }
 
     # samtools version sanity check
-    if(grepl("[^0-9.]",condaenv_samtools_version)){
+    if(grepl("[^0-9.]",condaenv_samtools_version)|(condaenv_samtools_version=="auto")){
         stop("Invalid samtools version number. Please find correct version number refering to 'https://anaconda.org/bioconda/samtools'.")
     }
 
