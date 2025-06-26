@@ -234,7 +234,7 @@ system.time({
             ,min_mapq = 30
             ,tmpdir="tmpdir"
             ,condaenv = "env_samtools"
-            ,condaenv_samtools_version="1.21"
+            ,condaenv_samtools_version="auto"
         )
 })
 
@@ -252,7 +252,7 @@ if(!SKIP){
                 ,N_cores = N_cores
                 ,min_mapq = 30
                 ,tmpdir="tmpdir"
-                ,modules="samtools/samtools_bcftools_1.20__bedtools_2.31.1"
+                ,modules="module/file/example/1.2" # name of modulefile the user want to use
             )
     })
 }
