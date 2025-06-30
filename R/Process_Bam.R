@@ -495,18 +495,21 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv
     }
 
     # samtools version sanity check
-    if(grepl("[^0-9.]",condaenv_samtools_version)|(condaenv_samtools_version=="auto")){
+    if(grepl("[^0-9.]",condaenv_samtools_version)&(condaenv_samtools_version!="auto")){
         stop("Invalid samtools version number. Please find correct version number refering to 'https://anaconda.org/bioconda/samtools'.")
     }
 
 
     # Load samtools conda environment
     if(condaenv_samtools_version=="auto"){
+        ## samtools_to_install <- glue("samtools")
         samtools_to_install <- "samtools"
     }else{
-        samtools_to_install <- glue("samtools=={condaenv_samtools_version}")
+        samtools_to_install <- glue("samtools={condaenv_samtools_version}")
+        ## samtools_to_install <- glue("samtools")
     }
 
+    cat(samtools_to_install,file=glue("/nfs/home/jlee307/jlee307_24/HPV_SV/ELViS_latest/Bioconductor/test2_{condaenv_samtools_version}.txt"),append=TRUE)
     samtools_env <- BasiliskEnvironment(
         envname=condaenv
         ,pkgname="ELViS"
