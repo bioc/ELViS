@@ -190,8 +190,8 @@ system.time({
             ,min_mapq = 30
             ,tmpdir=tmpdir
             ,condaenv = "env_samtools"
-            #,condaenv_samtools_version="auto"
-             ,condaenv_samtools_version="1.22"
+            ,condaenv_samtools_version="auto"
+            #,condaenv_samtools_version="1.22"
         )
 })
 
