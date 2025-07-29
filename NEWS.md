@@ -1,7 +1,7 @@
-# ELViS 1.1.6
+# ELViS 1.1.7
 * Build error fix
 
-# ELViS 1.1.1-1.1.5
+# ELViS 1.1.1-1.1.6
 * Build error fix
 
 # ELViS 1.1.0

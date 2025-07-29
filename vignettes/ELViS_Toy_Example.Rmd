@@ -190,8 +190,8 @@ system.time({
             ,min_mapq = 30
             ,tmpdir=tmpdir
             ,condaenv = "env_samtools"
-            ,condaenv_samtools_version="auto"
-            #,condaenv_samtools_version="1.22"
+            #,condaenv_samtools_version="auto"
+            ,condaenv_samtools_version="1.22"
         )
 })
 
@@ -201,7 +201,7 @@ system.time({
 
 
 
-```{r eval=FALSE, , eval=FALSE, include=FALSE}
+```{r eval=FALSE, eval=FALSE, include=FALSE}
 
 # Actual depth matrix of 120 samples had been generated using the follpwing code
 
@@ -235,8 +235,8 @@ system.time({
             ,min_mapq = 30
             ,tmpdir="tmpdir"
             ,condaenv = "env_samtools"
-            ,condaenv_samtools_version="auto"
-            #,condaenv_samtools_version="1.22"
+            #,condaenv_samtools_version="auto"
+            ,condaenv_samtools_version="1.22"
         )
 })
 
