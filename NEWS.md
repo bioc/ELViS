@@ -1,7 +1,7 @@
-# ELViS 1.1.7
-* Build error fix
+# ELViS 1.1.8
+* Fixed some incompatibility issue with basilisk package. basilisk does not support conda package installation at least for now. So partly reverted to reticulate package for samtools installation.
 
-# ELViS 1.1.1-1.1.6
+# ELViS 1.1.1-1.1.7
 * Build error fix
 
 # ELViS 1.1.0

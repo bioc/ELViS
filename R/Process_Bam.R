@@ -20,6 +20,7 @@
 #' @importFrom  parallel mclapply    detectCores
 #' @rawNamespace import(data.table, except=c(between,first,last,shift,yearmon,yearqtr))
 #' @importFrom basilisk BasiliskEnvironment obtainEnvironmentPath
+#' @importFrom reticulate conda_create
 #' @export
 #'
 #' @examples
@@ -505,15 +506,17 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv
         ## samtools_to_install <- glue("samtools")
         samtools_to_install <- "samtools"
     }else{
-        samtools_to_install <- glue("samtools={condaenv_samtools_version}")
+        samtools_to_install <- as.character(glue("samtools={condaenv_samtools_version}"))
         ## samtools_to_install <- glue("samtools")
     }
 
+    envname <- as.character(glue("{condaenv}_{condaenv_samtools_version}"))
+
     samtools_env <- BasiliskEnvironment(
-        envname=condaenv
+        envname=envname 
         ,pkgname="ELViS"
-        ,channels = c("conda-forge","bioconda")
-        ,packages=c(samtools_to_install)
+        ,channels = NULL #c("conda-forge","bioconda")
+        ,packages = NULL #c(samtools_to_install)
     )
 
     env_dir <- obtainEnvironmentPath(samtools_env)
@@ -522,6 +525,15 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv
         PATH = file.path(env_dir,"bin"),
         LD_LIBRARY_PATH = file.path(env_dir,"lib")
     )
+    
+    if( !file.exists(glue("{envs[['PATH']]}/samtools")) ){
+        conda_create(
+            envname=env_dir  #condaenv
+            ,packages=c(samtools_to_install)
+            ,channel = c("conda-forge","bioconda")
+            ,conda = paste0(dirname(dirname(dirname(env_dir))),"/0/bin/mamba")
+        )
+    }
 
     return(envs)
 }
