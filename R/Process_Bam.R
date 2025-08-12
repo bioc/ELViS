@@ -19,8 +19,7 @@
 #' @return a matrix of positions x samples containing base-resolution raw read depth
 #' @importFrom  parallel mclapply    detectCores
 #' @rawNamespace import(data.table, except=c(between,first,last,shift,yearmon,yearqtr))
-#' @importFrom basilisk BasiliskEnvironment obtainEnvironmentPath
-#' @importFrom reticulate conda_create
+#' @importFrom reticulate conda_create conda_list
 #' @export
 #'
 #' @examples
@@ -491,12 +490,12 @@ check_mode_os <- function(mode){
 
 get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv){
     # check if basilisk is installed and install if not
-    if (!requireNamespace("basilisk", quietly = TRUE)) {
-        stop("R Package 'basilisk' does not exist. Please install it by following instructions in 'https://www.bioconductor.org/packages/release/bioc/html/basilisk.html'")
+    if (!requireNamespace("reticulate", quietly = TRUE)) {
+        stop("R Package 'reticulate' is not installed. Please install it from CRAN by executing this command.\n install.pacakges('reticulate')")
     }
 
     # samtools version sanity check
-    if(grepl("[^0-9.]",condaenv_samtools_version)&(condaenv_samtools_version!="auto")){
+    if(grepl("[^0-9.]",condaenv_samtools_version)&&(condaenv_samtools_version!="auto")){
         stop("Invalid samtools version number. Please find correct version number refering to 'https://anaconda.org/bioconda/samtools'.")
     }
 
@@ -512,29 +511,27 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv
 
     envname <- as.character(glue("{condaenv}_{condaenv_samtools_version}"))
 
-    samtools_env <- BasiliskEnvironment(
-        envname=envname 
-        ,pkgname="ELViS"
-        ,channels = NULL #c("conda-forge","bioconda")
-        ,packages = NULL #c(samtools_to_install)
-    )
 
-    env_dir <- obtainEnvironmentPath(samtools_env)
+    envs_df <- conda_list()
+
+    # create conda env if there is none
+    if (!(envname %in% envs_df$name)){
+        conda_create(
+            envname=envname  #condaenv
+            ,packages=samtools_to_install
+            ,channel = c("conda-forge","bioconda")
+        )
+        
+        envs_df <- conda_list() 
+    }
+    
+    env_dir <- envs_df %>% dplyr::filter(name==envname) %>% with(python) %>% dirname %>% dirname
 
     envs <- c(
         PATH = file.path(env_dir,"bin"),
         LD_LIBRARY_PATH = file.path(env_dir,"lib")
     )
     
-    if( !file.exists(glue("{envs[['PATH']]}/samtools")) ){
-        conda_create(
-            envname=env_dir  #condaenv
-            ,packages=c(samtools_to_install)
-            ,channel = c("conda-forge","bioconda")
-            ,conda = paste0(dirname(dirname(dirname(env_dir))),"/0/bin/mamba")
-        )
-    }
-
     return(envs)
 }
 
