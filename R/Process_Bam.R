@@ -1,7 +1,7 @@
 #' Generate a read depth matrix of positions x samples from input BAM files list
 #'
 #' @param bam_files Vector containing bam file names in character
-#' @param mode Mode of read depth calculation. Either of `c("samtools_basilisk","samtools_custom","Rsamtools")` are acceptable. If run on Windows OS, it will coerced to `"Rsamtools"` (Default : `"samtools_basilisk"`)
+#' @param mode Mode of read depth calculation. Either of `c("samtools_reticulate","samtools_custom","Rsamtools")` are acceptable. If run on Windows OS, it will coerced to `"Rsamtools"` (Default : `"samtools_reticulate"`)
 #' @param coord_or_target_virus_name The name of the target virus. This should be equal to the name of the sequence in the FASTA file reads are aligned to.
 #' @param is_virus logical indicating if the coord_or_target_virus_name is for viral genome(TRUE) or non-viral genome(FALSE) (default : TRUE)
 #' @param N_cores Number of cores to use for parallel processing (Default : min(10,available cores))
@@ -12,8 +12,8 @@
 #' @param envs (samtools) Environmental variables for samtools. (Default : NULL)
 #' @param tmpdir (samtools) Temporary file directory (Default : `tempdir()`)
 #' @param samtools (samtools) Absolute path to samtools executable (Default : NULL)
-#' @param condaenv (samtools_basilisk) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : `"env_samtools"`)
-#' @param condaenv_samtools_version (samtools_basilisk) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")
+#' @param condaenv (samtools_reticulate) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : `"env_samtools"`)
+#' @param condaenv_samtools_version (samtools_reticulate) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")
 #'
 #'
 #' @return a matrix of positions x samples containing base-resolution raw read depth
@@ -41,10 +41,10 @@
 #' # get read depth matrix
 #' tmpdir <- tempdir()
 #'
-#' mtrx_samtools_basilisk <-
+#' mtrx_samtools_reticulate <-
 #'  get_depth_matrix(
 #'   bam_files = bam_files,coord_or_target_virus_name = target_virus_name,is_virus = TRUE
-#'  ,mode = "samtools_basilisk"
+#'  ,mode = "samtools_reticulate"
 #'  ,N_cores = N_cores
 #'  ,min_mapq = 30
 #'  ,tmpdir=tempdir()
@@ -54,7 +54,7 @@
 #'
 get_depth_matrix <-
     function(
-        bam_files,mode="samtools_basilisk"
+        bam_files,mode="samtools_reticulate"
         ,coord_or_target_virus_name
         ,is_virus = TRUE
         #common options
@@ -93,8 +93,23 @@ get_depth_matrix <-
         # custom samtools not available for windows
         mode <- check_mode_os(mode)
 
-        if(mode == "samtools_basilisk"){
-            envs <- get_envs_samtools_basilisk(condaenv_samtools_version,condaenv)
+        if(mode == "samtools_reticulate"){
+            res <- tryCatch(
+                       {
+                           list(envs=get_envs_samtools_reticulate(condaenv_samtools_version,condaenv),
+                           is_error=FALSE)
+                       },
+                       error = function(err){
+                           message("Failed to create conda environment: ", err$message)
+                           list(envs = NULL,is_error=TRUE)                      
+                       }
+            )
+            if(!res$is_error){
+                envs <- res$envs 
+            }else{
+                message(glue("Changing mode from {mode} to Rsamtools"))
+                mode <- "Rsamtools"
+            }
         }
 
         if(mode == "Rsamtools"){
@@ -108,7 +123,7 @@ get_depth_matrix <-
                     coord_or_target_virus_name = coord_or_target_virus_name,is_virus = is_virus,N_cores = N_cores,max_depth = max_depth,min_mapq=min_mapq
                     ,min_base_quality=min_base_quality
                 )
-        }else if(mode %in% c("samtools_custom","samtools_basilisk")){
+        }else if(mode %in% c("samtools_custom","samtools_reticulate")){
             if(!dir.exists(tmpdir)){ dir.create(tmpdir) }
             out_mtrx <-
                 get_depth_matrix_samtools(
@@ -482,13 +497,13 @@ check_mode_os <- function(mode){
         }
     }
 
-    if( !(mode %in% c("samtools_basilisk","samtools_custom","Rsamtools")) ){
-        stop(glue("mode='{mode}' is not an allowed argument. Available arguments are 'samtools_basilisk','samtools_custom', and 'Rsamtools'"))
+    if( !(mode %in% c("samtools_reticulate","samtools_custom","Rsamtools")) ){
+        stop(glue("mode='{mode}' is not an allowed argument. Available arguments are 'samtools_reticulate','samtools_custom', and 'Rsamtools'"))
     }
     return(mode)
 }
 
-get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv){
+get_envs_samtools_reticulate <- function(condaenv_samtools_version="auto",condaenv){
     # check if basilisk is installed and install if not
     if (!requireNamespace("reticulate", quietly = TRUE)) {
         stop("R Package 'reticulate' is not installed. Please install it from CRAN by executing this command.\n install.pacakges('reticulate')")
@@ -524,8 +539,8 @@ get_envs_samtools_basilisk <- function(condaenv_samtools_version="auto",condaenv
         
         envs_df <- conda_list() 
     }
-    
-    env_dir <- envs_df %>% dplyr::filter(name==envname) %>% with(python) %>% dirname %>% dirname
+
+    env_dir <- envs_df %>% filter(.data$name==envname) %>% {.$python} %>% dirname %>% dirname
 
     envs <- c(
         PATH = file.path(env_dir,"bin"),

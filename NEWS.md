@@ -1,3 +1,7 @@
+# ELViS 1.1.10
+* Reflected changes made in 1.1.9 to test scripts
+* If conda env creation fails in samtools_reticulate mode, it defaults to Rsamtools for base-level read depth calculation.
+
 # ELViS 1.1.9
 * Using reticulate to install and use conda environment
 
@@ -37,12 +41,12 @@
 
 # ELViS 0.99.5
 
-* Fixes according to initial main review from Bioconductor at https://github.com/Bioconductor/Contributions/issues/3631#issuecomment-2548723782
+* Fixes according to initial main review from Bioconductor 
   - previous version had issue in updating
 
 # ELViS 0.99.4
 
-* Fixes according to initial main review from Bioconductor at https://github.com/Bioconductor/Contributions/issues/3631#issuecomment-2548723782
+* Fixes according to initial main review from Bioconductor 
 
 # ELViS 0.99.3
 

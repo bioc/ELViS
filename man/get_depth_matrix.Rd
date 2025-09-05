@@ -6,7 +6,7 @@
 \usage{
 get_depth_matrix(
   bam_files,
-  mode = "samtools_basilisk",
+  mode = "samtools_reticulate",
   coord_or_target_virus_name,
   is_virus = TRUE,
   N_cores = detectCores(),
@@ -24,7 +24,7 @@ get_depth_matrix(
 \arguments{
 \item{bam_files}{Vector containing bam file names in character}
 
-\item{mode}{Mode of read depth calculation. Either of \code{c("samtools_basilisk","samtools_custom","Rsamtools")} are acceptable. If run on Windows OS, it will coerced to \code{"Rsamtools"} (Default : \code{"samtools_basilisk"})}
+\item{mode}{Mode of read depth calculation. Either of \code{c("samtools_reticulate","samtools_custom","Rsamtools")} are acceptable. If run on Windows OS, it will coerced to \code{"Rsamtools"} (Default : \code{"samtools_reticulate"})}
 
 \item{coord_or_target_virus_name}{The name of the target virus. This should be equal to the name of the sequence in the FASTA file reads are aligned to.}
 
@@ -46,9 +46,9 @@ get_depth_matrix(
 
 \item{samtools}{(samtools) Absolute path to samtools executable (Default : NULL)}
 
-\item{condaenv}{(samtools_basilisk) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : \code{"env_samtools"})}
+\item{condaenv}{(samtools_reticulate) Name of the conda environment in which samtools are installed. If no environment with this name is available, one will be created. (Default : \code{"env_samtools"})}
 
-\item{condaenv_samtools_version}{(samtools_basilisk) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")}
+\item{condaenv_samtools_version}{(samtools_reticulate) The version of samtools to install in the conda environment using basilisk. If set to "auto", the latest available version of samtools will be installed.  (Default : "auto")}
 }
 \value{
 a matrix of positions x samples containing base-resolution raw read depth
@@ -75,10 +75,10 @@ N_cores <- 1L
 # get read depth matrix
 tmpdir <- tempdir()
 
-mtrx_samtools_basilisk <-
+mtrx_samtools_reticulate <-
  get_depth_matrix(
   bam_files = bam_files,coord_or_target_virus_name = target_virus_name,is_virus = TRUE
- ,mode = "samtools_basilisk"
+ ,mode = "samtools_reticulate"
  ,N_cores = N_cores
  ,min_mapq = 30
  ,tmpdir=tempdir()

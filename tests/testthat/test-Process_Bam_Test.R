@@ -15,10 +15,10 @@ os_name <- Sys.info()["sysname"]
 
 #### Function to be tested ####
 if( os_name != "Windows" ){
-mtrx_samtools_basilisk <-
+mtrx_samtools_reticulate <-
     get_depth_matrix(
         bam_files = bam_files,coord_or_target_virus_name = coord_or_target_virus_name,is_virus = is_virus
-        ,mode = "samtools_basilisk"
+        ,mode = "samtools_reticulate"
         ,N_cores = N_cores
         ,min_mapq = 30
         ,tmpdir=tempdir()
@@ -96,8 +96,24 @@ condaenv <- "env_samtools"
 condaenv_samtools_version <- "1.21"
 modules = NULL
 
+envname <- as.character(glue("{condaenv}_{condaenv_samtools_version}"))
+
+conda_list_res <- tryCatch(
+  {
+    list(envs_df = conda_list(),
+         is_error = FALSE)
+  },
+  error = function(err) {
+    message("Failed to get conda envs: ", err$message)
+    list(envs_df <- NULL, is_error = TRUE)
+  }
+)
+
+
+if(!conda_list_res$is_error){
+
 #### Function to be tested ####
-envs <- get_envs_samtools_basilisk(condaenv_samtools_version,condaenv)
+envs <- get_envs_samtools_reticulate(condaenv_samtools_version,condaenv)
 
 bash_script_base <-
     get_bash_script_base(modules=modules,envs=envs)
@@ -145,6 +161,7 @@ mtrx_satools <-
         ,tmpdir=tmpdir
         ,samtools=samtools
     )
+}
 
 }
 
@@ -163,19 +180,41 @@ true_mtrx_dimnames <-
 
 if( os_name != "Windows" ){
 
-samtools_env <- BasiliskEnvironment(
-    envname=condaenv
-    ,pkgname="ELViS"
-    ,channels = c("conda-forge","bioconda")
-    ,packages=c(glue("samtools=={condaenv_samtools_version}"))
-)
 
-env_dir <- obtainEnvironmentPath(samtools_env)
+
+# skip if conda failed to be created - testing only Rsamtools
+if(!conda_list_res$is_error){
+
+    envs_df <- conda_list_res$envs_df
+
+    # create conda env if there is none
+    if (!(envname %in% envs_df$name)){
+        conda_create(
+            envname=envname  #condaenv
+            ,packages=samtools_to_install
+            ,channel = c("conda-forge","bioconda")
+        )
+
+        envs_df <- conda_list()
+    }
+
+    env_dir <- envs_df %>% dplyr::filter(name==envname) %>% with(python) %>% dirname %>% dirname
+
+# samtools_env <- BasiliskEnvironment(
+#    envname=condaenv
+#    ,pkgname="ELViS"
+#    ,channels = c("conda-forge","bioconda")
+#    ,packages=c(glue("samtools=={condaenv_samtools_version}"))
+# )
+#
+# env_dir <- obtainEnvironmentPath(samtools_env)
 
 true_env <- c(
     PATH = file.path(env_dir,"bin"),
     LD_LIBRARY_PATH = file.path(env_dir,"lib")
 )
+
+}
 
 }
 
@@ -204,13 +243,13 @@ test_that("Bam Processing_Common", {
 })
 
 
-if( os_name != "Windows" ){
+if( (os_name != "Windows") && (!conda_list_res$is_error) ){
 
 test_that("Bam Processing Linux and MacOS", {
 
     # get_depth_matrix
     testthat::expect_equal(
-        mtrx_samtools_basilisk[1:5,1:2],
+        mtrx_samtools_reticulate[1:5,1:2],
         true_mtrx_dimnames
     )
 
@@ -226,7 +265,7 @@ test_that("Bam Processing Linux and MacOS", {
         true_depth
     )
 
-    # get_envs_samtools_basilisk
+    # get_envs_samtools_reticulate
     testthat::expect_equal(
         envs,
         true_env

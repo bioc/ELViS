@@ -185,7 +185,7 @@ system.time({
     mtrx_samtools_reticulate__example = 
         get_depth_matrix(
             bam_files = bam_files,coord_or_target_virus_name = target_virus_name
-            ,mode = "samtools_basilisk"
+            ,mode = "samtools_reticulate"
             ,N_cores = N_cores
             ,min_mapq = 30
             ,tmpdir=tmpdir
@@ -230,7 +230,7 @@ system.time({
     mtrx_samtools_reticulate = 
         get_depth_matrix(
             bam_files = bam_files,coord_or_target_virus_name = target_virus_name
-            ,mode = "samtools_basilisk"
+            ,mode = "samtools_reticulate"
             ,N_cores = N_cores
             ,min_mapq = 30
             ,tmpdir="tmpdir"
