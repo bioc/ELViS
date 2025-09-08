@@ -1,3 +1,6 @@
+# ELViS 1.1.11
+* Added error handling code regarding conda env creation error
+
 # ELViS 1.1.10
 * Reflected changes made in 1.1.9 to test scripts
 * If conda env creation fails in samtools_reticulate mode, it defaults to Rsamtools for base-level read depth calculation.

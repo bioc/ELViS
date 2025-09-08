@@ -113,8 +113,26 @@ conda_list_res <- tryCatch(
 if(!conda_list_res$is_error){
 
 #### Function to be tested ####
-envs <- get_envs_samtools_reticulate(condaenv_samtools_version,condaenv)
+envs_res <- tryCatch(
+  {
+    list(envs = get_envs_samtools_reticulate(condaenv_samtools_version,condaenv),
+         is_error = FALSE)
+  },
+  error = function(err) {
+    message("Failed to get conda envs: ", err$message)
+    list(envs <- NULL, is_error = TRUE)
+  }
+)
 
+if(envs_res$is_error){
+  conda_list_res$is_error = TRUE
+}
+
+
+}
+
+if(!conda_list_res$is_error){
+#### Function to be tested ####
 bash_script_base <-
     get_bash_script_base(modules=modules,envs=envs)
 
