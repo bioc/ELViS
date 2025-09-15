@@ -109,7 +109,6 @@ conda_list_res <- tryCatch(
   }
 )
 
-
 if(!conda_list_res$is_error){
 
 #### Function to be tested ####
@@ -127,6 +126,8 @@ envs_res <- tryCatch(
 if(envs_res$is_error){
   conda_list_res$is_error = TRUE
 }
+
+envs <- envs_res$envs
 
 
 }
@@ -199,7 +200,6 @@ true_mtrx_dimnames <-
 if( os_name != "Windows" ){
 
 
-
 # skip if conda failed to be created - testing only Rsamtools
 if(!conda_list_res$is_error){
 
@@ -235,6 +235,8 @@ true_env <- c(
 }
 
 }
+
+
 
 }
 

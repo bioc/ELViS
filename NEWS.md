@@ -1,3 +1,6 @@
+# ELViS 1.1.12
+* Minor bug fix in test script
+
 # ELViS 1.1.11
 * Added error handling code regarding conda env creation error
 
